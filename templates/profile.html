@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+
+<!-- Приветствие -->
+<div class="profile-hero">
+    <div class="profile-avatar">👤</div>
+    <div class="profile-welcome">
+        <h1>Привет, {{ user.username }}!</h1>
+        <p>Рады видеть вас снова. Здесь хранятся ваши избранные рецепты.</p>
+    </div>
+</div>
+
+<!-- Блок статистики -->
+<div class="profile-stats">
+    <div class="stat-card">
+        <div class="stat-emoji">❤️</div>
+        <div class="stat-number">{{ favorites.count }}</div>
+        <div class="stat-label">в избранном</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-emoji">📅</div>
+        <div class="stat-number">{{ user.date_joined|date:"d.m.Y" }}</div>
+        <div class="stat-label">дата регистрации</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-emoji">🍳</div>
+        <div class="stat-number">повар</div>
+        <div class="stat-label">ваш статус</div>
+    </div>
+</div>
+
+<!-- Быстрые ссылки -->
+<div class="profile-quick-links">
+    <a href="{% url 'recipe_list' %}" class="quick-link">
+        <span class="quick-icon">📖</span>
+        Все рецепты
+    </a>
+    <a href="{% url 'search' %}" class="quick-link">
+        <span class="quick-icon">🔍</span>
+        Поиск по ингредиентам
+    </a>
+    <a href="{% url 'random_recipe' %}" class="quick-link">
+        <span class="quick-icon">🎲</span>
+        Случайный рецепт
+    </a>
+</div>
+
+<!-- Избранные рецепты -->
+<div class="profile-section">
+    <div class="section-header">
+        <h2>❤️ Избранные рецепты</h2>
+        {% if favorites %}
+            <span class="section-count">{{ favorites.count }} рецептов</span>
+        {% endif %}
+    </div>
+    
+    {% if favorites %}
+        <div class="favorites-grid">
+            {% for fav in favorites %}
+            <div class="favorite-card">
+                <div class="favorite-img">
+                    {% if fav.recipe.image %}
+                        <img src="{{ fav.recipe.image.url }}" alt="{{ fav.recipe.title }}">
+                    {% else %}
+                        <div class="no-img">🍳</div>
+                    {% endif %}
+                    <div class="favorite-category">{{ fav.recipe.category.name|default:"Без категории" }}</div>
+                    <div class="favorite-date">➕ {{ fav.created_at|date:"d.m.Y" }}</div>
+                </div>
+                <div class="favorite-info">
+                    <h3>{{ fav.recipe.title }}</h3>
+                    <div class="favorite-meta">
+                        <span>⏱ {{ fav.recipe.cooking_time }} мин</span>
+                    </div>
+                    <div class="favorite-ingredients">{{ fav.recipe.ingredients|truncatechars:60 }}</div>
+                    <div class="favorite-actions">
+                        <a href="{% url 'recipe_detail' fav.recipe.id %}" class="btn-small-primary">Приготовить →</a>
+                        <a href="{% url 'remove_from_favorites' fav.recipe.id %}?next=profile" class="btn-small-outline">Удалить</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-favorites">
+            <div class="empty-icon">😢</div>
+            <p>У вас пока нет избранных рецептов</p>
+            <p class="empty-hint">Нажмите «❤️ Добавить в избранное» на странице любого рецепта</p>
+            <a href="{% url 'recipe_list' %}" class="btn-primary-modern">📖 Перейти к рецептам</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Совет дня -->
+<div class="profile-tip">
+    <div class="tip-icon">💡</div>
+    <div class="tip-content">
+        <strong>Совет дня</strong>
+        <p>Чтобы быстро найти рецепт, используйте поиск по ингредиентам — введите продукты, которые есть дома, и мы подберём идеальное блюдо!</p>
+    </div>
+</div>
+
+<style>
+/* ===== СТИЛИ ДЛЯ ЛИЧНОГО КАБИНЕТА ===== */
+
+.profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: var(--surface);
+    border-radius: 28px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+}
+
+.profile-avatar {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.profile-welcome h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.profile-welcome p {
+    color: var(--text-soft);
+    font-size: 0.9rem;
+}
+
+/* Статистика */
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 1.25rem;
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-emoji {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-soft);
+}
+
+/* Быстрые ссылки */
+.profile-quick-links {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.quick-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface);
+    padding: 0.7rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    color: var(--text);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.quick-link:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: translateY(-2px);
+}
+
+.quick-icon {
+    font-size: 1rem;
+}
+
+/* Секция избранного */
+.profile-section {
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.25rem;
+}
+
+.section-header h2 {
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.section-count {
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    background: var(--surface-soft);
+    padding: 0.25rem 0.75rem;
+    border-radius: 30px;
+}
+
+/* Сетка избранных рецептов */
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+}
+
+.favorite-card {
+    background: var(--surface);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.favorite-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.favorite-img {
+    height: 180px;
+    background: linear-gradient(135deg, #f7ede5, #efe0d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.favorite-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-img {
+    font-size: 3rem;
+}
+
+.favorite-category {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+}
+
+.favorite-date {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.65rem;
+}
+
+.favorite-info {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.favorite-info h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.favorite-meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-soft);
+    font-size: 0.7rem;
+    margin-bottom: 0.5rem;
+}
+
+.favorite-ingredients {
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.favorite-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn-small-primary {
+    background: var(--primary);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+
+.btn-small-primary:hover {
+    background: var(--primary-dark);
+    transform: scale(1.02);
+}
+
+.btn-small-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+
+.btn-small-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Пустое состояние */
+.empty-favorites {
+    text-align: center;
+    padding: 2.5rem;
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-favorites p {
+    color: var(--text-soft);
+}
+
+.empty-hint {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+/* Совет дня */
+.profile-tip {
+    display: flex;
+    gap: 1rem;
+    background: #E8F5E0;
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.tip-icon {
+    font-size: 1.8rem;
+}
+
+.tip-content p {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    margin-top: 0.25rem;
+}
+
+/* Адаптивность */
+@media (max-width: 700px) {
+    .profile-hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-quick-links {
+        justify-content: center;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .favorites-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-tip {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+
+{% endblock %}

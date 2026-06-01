@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - готовим дома{% endblock %}
+
+{% block content %}
+
+<div class="hero-search">
+    <h2>Что сегодня приготовим?</h2>
+    <p>Введите продукты, которые есть дома, и мы подберем рецепты</p>
+    <form action="{% url 'search' %}" method="get" class="hero-search-form">
+        <input type="text" name="ingredients" placeholder="Например: курица, картофель, помидор...">
+        <button type="submit">Найти рецепты</button>
+    </form>
+    <div class="hero-tags">
+        <span>Популярное:</span>
+        <a href="/search/?ingredients=курица">курица</a>
+        <a href="/search/?ingredients=картофель">картофель</a>
+        <a href="/search/?ingredients=сыр">сыр</a>
+        <a href="/search/?ingredients=яйца">яйца</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ recipes_count|default:"0" }}</div>
+        <div class="stat-label">рецептов</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ users_count|default:"0" }}</div>
+        <div class="stat-label">пользователей</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">15+</div>
+        <div class="stat-label">категорий</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">30 мин</div>
+        <div class="stat-label">среднее время</div>
+    </div>
+</div>
+
+<div class="categories-scroll">
+    <div class="categories-wrapper">
+        {% for cat in categories %}
+        <a href="{% url 'recipe_list' %}?category={{ cat.id }}" class="category-chip">
+            <span class="cat-emoji">
+                {% if cat.name == "Салаты" %}🥗
+                {% elif cat.name == "Супы" %}🍲
+                {% elif cat.name == "Горячее" %}🍖
+                {% elif cat.name == "Десерты" %}🍰
+                {% elif cat.name == "Завтраки" %}🍳
+                {% elif cat.name == "Напитки" %}🥤
+                {% else %}🍽️
+                {% endif %}
+            </span>
+            {{ cat.name }}
+        </a>
+        {% empty %}
+        <p>Категории не добавлены</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="scroll-container">
+    <div class="scroll-wrapper">
+        {% for recipe in new_recipes %}
+        <div class="scroll-card">
+            <div class="scroll-card-img">
+                {% if recipe.image %}
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                {% else %}
+                    <div class="no-img-small">🍳</div>
+                {% endif %}
+            </div>
+            <div class="scroll-card-info">
+                <h4>{{ recipe.title }}</h4>
+                <div class="scroll-card-meta">⏱ {{ recipe.cooking_time }} мин</div>
+                <a href="{% url 'recipe_detail' recipe.id %}" class="scroll-card-link">Приготовить →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>Нет рецептов</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="tips-scroll">
+    <div class="tips-wrapper">
+        <div class="tip-item">
+            <span class="tip-emoji">🧅</span>
+            <p>Чтобы лук не щипал глаза, смочите нож холодной водой</p>
+        </div>
+        <div class="tip-item">
+            <span class="tip-emoji">🥚</span>
+            <p>Яйца будут легче чиститься, если после варки окунуть их в холодную воду</p>
+        </div>
+        <div class="tip-item">
+            <span class="tip-emoji">🍅</span>
+            <p>Добавьте щепотку сахара в томатный соус — вкус станет насыщеннее</p>
+        </div>
+        <div class="tip-item">
+            <span class="tip-emoji">🥔</span>
+            <p>Картофель для пюре нужно заливать горячей водой, а не холодной</p>
+        </div>
+    </div>
+</div>
+
+<div class="recipes-grid">
+    {% for recipe in popular_recipes %}
+    <div class="recipe-card">
+        <div class="recipe-img">
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+            {% else %}
+                🍳
+            {% endif %}
+        </div>
+        <div class="recipe-info">
+            <h3 class="recipe-title">{{ recipe.title }}</h3>
+            <div class="recipe-meta">⏱ {{ recipe.cooking_time }} мин</div>
+            <div class="recipe-ingredients">{{ recipe.ingredients|truncatechars:50 }}</div>
+            <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary btn-small">Приготовить →</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>Нет рецептов</p>
+    {% endfor %}
+</div>
+
+<div class="inspire-card">
+    <div class="inspire-quote">"</div>
+    <p>Готовить — это искусство. Даже самый простой рецепт можно превратить в шедевр, если добавить в него немного любви.</p>
+    <div class="inspire-author">— неизвестный шеф-повар</div>
+</div>
+
+{% endblock %}

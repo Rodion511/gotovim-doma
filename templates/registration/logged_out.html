@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Выход из аккаунта{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-card" style="text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">👋</div>
+        <h2>Вы вышли из аккаунта</h2>
+        <p style="margin: 1rem 0; color: var(--text-soft);">Спасибо, что пользуетесь нашим сайтом. Ждём вас снова!</p>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+            <a href="{% url 'login' %}" class="btn btn-primary">🔑 Войти снова</a>
+            <a href="{% url 'home' %}" class="btn btn-outline">🏠 На главную</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

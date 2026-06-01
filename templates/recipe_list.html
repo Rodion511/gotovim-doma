@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Все рецепты{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Все рецепты</h1>
+    <p>{{ recipes.count }} рецептов</p>
+</div>
+
+<div class="filter-panel">
+    <div class="filter-header">
+        <span>🔍 Фильтры</span>
+        <a href="{% url 'recipe_list' %}" class="reset-filters">Сбросить все</a>
+    </div>
+    
+    <form method="get" action="{% url 'recipe_list' %}" class="filter-form">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Категория</label>
+                {{ filter_form.category }}
+            </div>
+            
+            <div class="filter-group">
+                <label>Время приготовления</label>
+                {{ filter_form.cooking_time }}
+            </div>
+            
+            <div class="filter-group">
+                <label>Сортировка</label>
+                {{ filter_form.sort_by }}
+            </div>
+            
+            <div class="filter-group filter-search">
+                <label>Поиск по названию</label>
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Название блюда...">
+            </div>
+            
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter">Применить</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if request.GET.category or request.GET.cooking_time or search_query %}
+<div class="active-filters">
+    <span>Активные фильтры:</span>
+    
+    {% if request.GET.category %}
+    <span class="filter-badge">
+        Категория: 
+        {% for cat in categories %}
+            {% if cat.id|stringformat:"s" == request.GET.category %}
+                {{ cat.name }}
+            {% endif %}
+        {% endfor %}
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}&{% endif %}{% endfor %}">✕</a>
+    </span>
+    {% endif %}
+    
+    {% if request.GET.cooking_time %}
+    <span class="filter-badge">
+        Время: 
+        {% if request.GET.cooking_time == '15' %}До 15 минут
+        {% elif request.GET.cooking_time == '30' %}15-30 минут
+        {% elif request.GET.cooking_time == '60' %}30-60 минут
+        {% elif request.GET.cooking_time == '60+' %}Больше 60 минут
+        {% endif %}
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'cooking_time' %}{{ key }}={{ value }}&{% endif %}{% endfor %}">✕</a>
+    </span>
+    {% endif %}
+    
+    {% if search_query %}
+    <span class="filter-badge">
+        Поиск: "{{ search_query }}"
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'search' %}{{ key }}={{ value }}&{% endif %}{% endfor %}">✕</a>
+    </span>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="recipes-grid">
+    {% for recipe in recipes %}
+    <div class="recipe-card">
+        <div class="recipe-img">
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+            {% else %}
+                🍳
+            {% endif %}
+            {% if recipe.category %}
+                <span class="card-category">{{ recipe.category.name }}</span>
+            {% endif %}
+        </div>
+        <div class="recipe-info">
+            <h3 class="recipe-title">{{ recipe.title }}</h3>
+            <div class="recipe-meta">⏱ {{ recipe.cooking_time }} мин</div>
+            <div class="recipe-ingredients">{{ recipe.ingredients|truncatechars:60 }}</div>
+            <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary btn-small">Приготовить →</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <p>😢 Рецептов не найдено</p>
+        <p>Попробуйте изменить параметры поиска</p>
+        <a href="{% url 'recipe_list' %}" class="btn btn-primary">Сбросить фильтры</a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

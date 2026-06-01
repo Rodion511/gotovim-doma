@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация — Готовим дома{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-icon">🍳</div>
+        <h2>Создайте аккаунт</h2>
+        <p class="auth-subtitle">Присоединяйтесь к нам и сохраняйте любимые рецепты</p>
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" name="username" class="form-control" placeholder="Как вас называть?" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Электронная почта</label>
+                <input type="email" name="email" class="form-control" placeholder="example@mail.ru" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" name="password1" class="form-control" placeholder="Придумайте пароль" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Подтверждение пароля</label>
+                <input type="password" name="password2" class="form-control" placeholder="Введите пароль ещё раз" required>
+            </div>
+            
+            {% if form.errors %}
+            <div class="form-errors">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <p class="error-text">⚠️ {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="btn-auth">Зарегистрироваться</button>
+        </form>
+        
+        <p class="auth-footer">
+            Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a>
+        </p>
+    </div>
+</div>
+
+<style>
+/* Стили для страницы регистрации */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: var(--surface);
+    border-radius: 32px;
+    padding: 2.5rem;
+    max-width: 450px;
+    width: 100%;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.auth-card h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.auth-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.auth-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+}
+
+.auth-form .form-control {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: var(--surface);
+}
+
+.auth-form .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(124, 186, 63, 0.1);
+}
+
+.form-errors {
+    background: #fee2e2;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin: 0.25rem 0;
+}
+
+.btn-auth {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+.btn-auth:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+}
+
+.auth-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 500px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+    
+    .auth-card h2 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+{% endblock %}

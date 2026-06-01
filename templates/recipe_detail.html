@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ recipe.title }}{% endblock %}
+
+{% block content %}
+
+<div class="detail-container">
+    <a href="{% url 'recipe_list' %}" class="back-link">← Назад к рецептам</a>
+    
+    <div class="detail-header">
+        <h1>{{ recipe.title }}</h1>
+        <div class="detail-meta">
+            <span>⏱ {{ recipe.cooking_time }} минут</span>
+            {% if recipe.category %}
+                <span class="detail-category">{{ recipe.category.name }}</span>
+            {% endif %}
+        </div>
+        
+        {% if user.is_authenticated %}
+            {% if is_favorite %}
+                <a href="{% url 'remove_from_favorites' recipe.id %}?next=detail" class="favorite-btn active">❤️ В избранном</a>
+            {% else %}
+                <a href="{% url 'add_to_favorites' recipe.id %}" class="favorite-btn">🤍 Добавить в избранное</a>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    <div class="detail-grid">
+        <div class="detail-image">
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+            {% else %}
+                <div class="detail-no-image">🍳</div>
+            {% endif %}
+        </div>
+        
+        <div class="detail-ingredients">
+            <h3>🥘 Ингредиенты</h3>
+            <ul>
+                {% for ing in recipe.ingredients.split %}
+                    <li>{{ ing }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+    <div class="detail-description">
+        <h3>👨‍🍳 Приготовление</h3>
+        <p>{{ recipe.description|linebreaks }}</p>
+    </div>
+    
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{% url 'random_recipe' %}" class="btn btn-outline">🎲 Попробовать другой рецепт</a>
+    </div>
+</div>
+
+{% endblock %}
